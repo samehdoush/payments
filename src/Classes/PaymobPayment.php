@@ -10,11 +10,11 @@ use Nafezly\Payments\Classes\BaseController;
 
 class PaymobPayment extends BaseController implements PaymentInterface
 {
-    private $paymob_public_key;
-    private $paymob_secret_key;
-    private $paymob_integration_id;
-    private $paymob_currency;
-    private $paymob_hmac;
+    public $paymob_public_key;
+    public $paymob_secret_key;
+    public $paymob_integration_id;
+    public $paymob_currency;
+    public $paymob_hmac;
     public $verify_route_name;
 
     public function __construct()
@@ -72,8 +72,8 @@ class PaymobPayment extends BaseController implements PaymentInterface
             ],
             'special_reference'=>$unique_id,
             'expiration'=>3600,
-            'notification_url'=>route($this->verify_route_name,['payment'=>'paymob']),
-            'redirection_url'=>route($this->verify_route_name,['payment'=>'paymob'])
+            'notification_url'=>route($this->verify_route_name,['payment'=>'paymob','payment_id'=>$unique_id]),
+            'redirection_url'=>route($this->verify_route_name,['payment'=>'paymob','payment_id'=>$unique_id])
         ]); 
         $json_res = $res->json();
         if(isset($json_res['client_secret'])){
@@ -99,7 +99,7 @@ class PaymobPayment extends BaseController implements PaymentInterface
     {
         $string = $request['amount_cents'] . $request['created_at'] . $request['currency'] . $request['error_occured'] . $request['has_parent_transaction'] . $request['id'] . $request['integration_id'] . $request['is_3d_secure'] . $request['is_auth'] . $request['is_capture'] . $request['is_refunded'] . $request['is_standalone_payment'] . $request['is_voided'] . $request['order'] . $request['owner'] . $request['pending'] . $request['source_data_pan'] . $request['source_data_sub_type'] . $request['source_data_type'] . $request['success'];
 
-        if ( hash_equals(hash_hmac('sha512', $string, $this->paymob_hmac),$request['hmac']) ){
+        if ( isset($request['hmac']) && $request['hmac'] !=null &&  hash_equals(hash_hmac('sha512', $string, $this->paymob_hmac),$request['hmac'])  ){
             if ($request['success'] == "true") {
                 return [
                     'success' => true,

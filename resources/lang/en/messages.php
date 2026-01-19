@@ -25,4 +25,6 @@ return [
     'SKIPCASH_PAYMENT_REFUNDED'=>'Payment refunded',
     'SKIPCASH_PAYMENT_PENDING_REFUND'=>'Refund pending',
     'SKIPCASH_PAYMENT_REFUND_FAILED'=>'Refund failed',
+    'REDIRECTING_TO_PAYMENT'=>"Redirecting to Volet Payment...",
+    'PLEASE_WAIT_REDIRECT'=>"Please wait while we redirect you to the payment page."
 ];

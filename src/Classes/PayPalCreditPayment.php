@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Http;
 
 class PayPalCreditPayment extends BaseController implements PaymentInterface
 {
-    private $paypal_credit_client_id;
-    private $paypal_credit_secret;
-    private $verify_route_name;
+    public $paypal_credit_client_id;
+    public $paypal_credit_secret;
+    public $verify_route_name;
     public $paypal_credit_mode;
     public $currency;
     public $custom_values=[];
@@ -27,6 +27,26 @@ class PayPalCreditPayment extends BaseController implements PaymentInterface
         $this->verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
         $this->paypal_credit_mode = config('nafezly-payments.PAYPAL_CREDIT_MODE');
         $this->currency = config('nafezly-payments.PAYPAL_CREDIT_CURRENCY');
+    }
+
+    /**
+     * Get language in PayPal format (en-US, ar-SA)
+     *
+     * @return string
+     */
+    protected function getPayPalLocale()
+    {
+        $localeMap = [
+            'ar' => 'ar-SA',
+            'en' => 'en-US'
+        ];
+        
+        // If language is set, use it; otherwise default to en-US
+        if ($this->language && isset($localeMap[$this->language])) {
+            return $localeMap[$this->language];
+        }
+        
+        return 'en-US';
     }
 
     /**
@@ -82,7 +102,7 @@ class PayPalCreditPayment extends BaseController implements PaymentInterface
                 "paypal" => [
                     "experience_context" => [
                         "payment_method_preference" => "UNRESTRICTED",
-                        "locale" => "ar-SA",
+                        "locale" => $this->getPayPalLocale(),
                         "shipping_preference" => $this->source??"NO_SHIPPING",
                         "return_url" => route($this->verify_route_name,['payment'=>'paypal_credit']),
                         "cancel_url" => route($this->verify_route_name,['payment'=>'paypal_credit']),
@@ -116,9 +136,12 @@ class PayPalCreditPayment extends BaseController implements PaymentInterface
             ];
         $data= array_replace_recursive($data,$this->custom_values);
         //dd($data);
+        // Get PayPal locale format for Accept-Language header
+        $acceptLanguage = $this->getPayPalLocale();
+        
         $response = Http::withHeaders([
             'Content-Type'=> 'application/json',
-            'Accept-Language' => 'ar_SA',
+            'Accept-Language' => $acceptLanguage,
             'Authorization'=> 'Basic '.base64_encode($this->paypal_credit_client_id.':'.$this->paypal_credit_secret)
         ])->post('https://api-m'.$mode.'.paypal.com/v2/checkout/orders',$data);
 
@@ -127,6 +150,7 @@ class PayPalCreditPayment extends BaseController implements PaymentInterface
             return [
                 'payment_id'=>$response['id'],
                 'html' => /*$response*/ $this->generate_html([
+                    'language'=>$this->getPayPalLocale(),
                     'response'=>$response,
                     'currency'=>$this->currency??"USD",
                     'return_url'=>route($this->verify_route_name,['payment'=>'paypal_credit']),
@@ -252,6 +276,4 @@ class PayPalCreditPayment extends BaseController implements PaymentInterface
         $this->custom_values=$values;
         return $this;
     }
-
-
 }

@@ -15,10 +15,10 @@ use Nafezly\Payments\Classes\BaseController;
 
 class TapPayment extends BaseController implements PaymentInterface
 {
-    private $tap_secret_key;
-    private $tap_public_key;
-    private $tap_lang_code;
-    private $verify_route_name;
+    public $tap_secret_key;
+    public $tap_public_key;
+    public $tap_lang_code;
+    public $verify_route_name;
 
     public function __construct()
     {
@@ -27,6 +27,16 @@ class TapPayment extends BaseController implements PaymentInterface
         $this->tap_public_key = config('nafezly-payments.TAP_PUBLIC_KEY');
         $this->tap_lang_code = config('nafezly-payments.TAP_LANG_CODE');
         $this->verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
+    }
+
+    /**
+     * Get language in Tap format (ar, en)
+     *
+     * @return string
+     */
+    protected function getTapLang()
+    {
+        return $this->language;
     }
 
     /**
@@ -54,10 +64,14 @@ class TapPayment extends BaseController implements PaymentInterface
         else
             $unique_id = $this->payment_id;
 
+        // Use setLanguage() if called, otherwise fall back to config
+        // Tap uses lowercase format (ar, en)
+        $lang_code = $this->language ? $this->getTapLang() : $this->tap_lang_code;
+
         $response = Http::withHeaders([
             "authorization" => "Bearer " . $this->tap_secret_key,
             "Content-Type" => "application/json",
-            'lang_code' => $this->tap_lang_code
+            'lang_code' => $lang_code
         ])->post('https://api.tap.company/v2/charges', [
             "amount" => $this->amount,
             "currency" => $this->currency,

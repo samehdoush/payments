@@ -12,6 +12,7 @@ trait SetVariables
     public $source = null;
     public $currency = null;
     public $amount = null;
+    public $language = "ar";
 
 
     public function setPaymentId($value)
@@ -139,6 +140,25 @@ trait SetVariables
         if($user_phone!=null)$this->setUserPhone($user_phone);
         if($source!=null)$this->setSource($source);
     }
-    
+
+
+    /**
+     * Sets language - accepts "ar" or "en" and converts to appropriate format
+     *
+     * @param  string  $language
+     * @return $this
+     */
+    public function setLanguage($language="ar"){
+        // Normalize to lowercase for internal storage
+        $language = strtolower($language);
+        
+        // Accept only "ar" or "en", default to "ar"
+        if (!in_array($language, ['ar', 'en'])) {
+            $language = 'ar';
+        }
+        
+        $this->language = $language;
+        return $this;
+    }
 
 }

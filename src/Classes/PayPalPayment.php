@@ -18,9 +18,9 @@ use Nafezly\Payments\Classes\BaseController;
 
 class PayPalPayment extends BaseController implements PaymentInterface
 {
-    private $paypal_client_id;
-    private $paypal_secret;
-    private $verify_route_name;
+    public $paypal_client_id;
+    public $paypal_secret;
+    public $verify_route_name;
     public $paypal_mode;
     public $currency;
 
@@ -32,6 +32,26 @@ class PayPalPayment extends BaseController implements PaymentInterface
         $this->verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
         $this->paypal_mode = config('nafezly-payments.PAYPAL_MODE');
         $this->currency = config('nafezly-payments.PAYPAL_CURRENCY');
+    }
+
+    /**
+     * Get language in PayPal format (en-US, ar-SA)
+     *
+     * @return string
+     */
+    protected function getPayPalLocale()
+    {
+        $localeMap = [
+            'ar' => 'ar-SA',
+            'en' => 'en-US'
+        ];
+        
+        // If language is set, use it; otherwise default to en-US
+        if ($this->language && isset($localeMap[$this->language])) {
+            return $localeMap[$this->language];
+        }
+        
+        return 'en-US';
     }
 
     /**
@@ -66,6 +86,10 @@ class PayPalPayment extends BaseController implements PaymentInterface
 
         $request = new OrdersCreateRequest();
         $request->prefer('return=representation');
+        
+        // Get PayPal locale format (en-US, ar-SA)
+        $locale = $this->getPayPalLocale();
+        
         $request->body = [
             "intent" => "CAPTURE",
             "purchase_units" => [[
@@ -76,6 +100,7 @@ class PayPalPayment extends BaseController implements PaymentInterface
                 ]
             ]],
             "application_context" => [
+                "locale" => $locale,
                 "cancel_url" => route($this->verify_route_name, ['payment' => "paypal"]),
                 "return_url" => route($this->verify_route_name, ['payment' => "paypal"])
             ]

@@ -6,6 +6,8 @@ return [
     'PAYMOB_INTEGRATION_ID' => env('PAYMOB_INTEGRATION_ID',""), //array of integration ids
     'PAYMOB_CURRENCY'=> env('PAYMOB_CURRENCY',"EGP"),
     'PAYMOB_HMAC' => env('PAYMOB_HMAC'),
+    #PAYMOB_WALLET (vodaphone-cash,orange-money,etisalat-cash,we-cash,meza-wallet) - test phone 01010101010 ,PIN & OTP IS 123456
+    'PAYMOB_WALLET_INTEGRATION_ID'=>env('PAYMOB_WALLET_INTEGRATION_ID'),
 
     #HYPERPAY
     'HYPERPAY_BASE_URL' => env('HYPERPAY_BASE_URL', "https://eu-test.oppwa.com"),
@@ -21,7 +23,7 @@ return [
     'KASHIER_ACCOUNT_KEY' => env('KASHIER_ACCOUNT_KEY'),
     'KASHIER_IFRAME_KEY' => env('KASHIER_IFRAME_KEY'),
     'KASHIER_TOKEN' => env('KASHIER_TOKEN'),
-    'KASHIER_URL' => env('KASHIER_URL', "https://checkout.kashier.io"),
+    'KASHIER_URL' => env('KASHIER_URL', "https://payments.kashier.io"),
     'KASHIER_MODE' => env('KASHIER_MODE', "test"), //live or test
     'KASHIER_CURRENCY'=>env('KASHIER_CURRENCY',"EGP"),
     'KASHIER_WEBHOOK_URL'=>env('KASHIER_WEBHOOK_URL'),
@@ -62,8 +64,6 @@ return [
     'OPAY_BASE_URL'=>env('OPAY_BASE_URL',"https://sandboxapi.opaycheckout.com"),//https://api.opaycheckout.com for production
 
 
-    #PAYMOB_WALLET (vodaphone-cash,orange-money,etisalat-cash,we-cash,meza-wallet) - test phone 01010101010 ,PIN & OTP IS 123456
-    'PAYMOB_WALLET_INTEGRATION_ID'=>env('PAYMOB_WALLET_INTEGRATION_ID'),
 
     #Paytabs
     'PAYTABS_PROFILE_ID'  => env('PAYTABS_PROFILE_ID'),
@@ -208,5 +208,87 @@ return [
     'GARANTIBBVA_TEST_URL'=>env('GARANTIBBVA_TEST_URL','https://sanalposprovtest.garantibbva.com.tr/servlet/gt3dengine'),
     'GARANTIBBVA_LIVE_URL'=>env('GARANTIBBVA_LIVE_URL','https://sanalposprov.garantibbva.com.tr/servlet/gt3dengine'),
 
+    'ONELAT_KEY'=>env('ONELAT_KEY',''),
+    'ONELAT_SECRET'=>env('ONELAT_SECRET',''),
+    'ONELAT_API_BASE_URL'=>env('ONELAT_API_BASE_URL','https://api.one.lat'),
+    'ONELAT_CHECKOUT_BASE_URL'=>env('ONELAT_CHECKOUT_BASE_URL','https://one.lat/checkout'),
+
+
+    'PAYOP_PUBLIC_KEY'=>env('PAYOP_PUBLIC_KEY'),
+    'PAYOP_SECRET_KEY'=>env('PAYOP_SECRET_KEY'),
+    'PAYOP_JWT'=>env('PAYOP_JWT'),//null
+
+
+    'MAMOPAYMENT_BASE_URL'=>env('MAMOPAYMENT_BASE_URL','https://business.mamopay.com'),
+    'MAMOPAYMENT_API_KEY'=>env('MAMOPAYMENT_API_KEY'),
+
+
+    #MYFATOORAH
+    /*
+    * API URLs by country:
+    * Kuwait, UAE, Bahrain, Jordan, Oman: https://api.myfatoorah.com/
+    * Saudi Arabia: https://api-sa.myfatoorah.com/
+    * Qatar: https://api-qa.myfatoorah.com/
+    * Egypt: https://api-eg.myfatoorah.com/
+    * Demo/Test: https://apitest.myfatoorah.com/
+    */
+    'MYFATOORAH_API_KEY'=>env('MYFATOORAH_API_KEY'),
+    'MYFATOORAH_BASE_URL'=>env('MYFATOORAH_BASE_URL','https://apitest.myfatoorah.com'),
+    'MYFATOORAH_CURRENCY'=>env('MYFATOORAH_CURRENCY','USD'),
+
+
+    #XPAY
+    /*
+    * Documentation: https://xpayeg.github.io/docs/
+    * Base URLs:
+    * Test: https://staging.xpay.app/api/v1
+    * Live: https://community.xpay.app/api/v1
+    * Authentication: Uses x-api-key header
+    * Endpoint: /payments/pay/variable-amount
+    * Required: API Key, Community ID (Merchant ID), Variable Amount ID (API Payment ID)
+    */
+    'XPAY_API_KEY'=>env('XPAY_API_KEY'),
+    'XPAY_COMMUNITY_ID'=>env('XPAY_COMMUNITY_ID'),
+    'XPAY_VARIABLE_AMOUNT_ID'=>env('XPAY_VARIABLE_AMOUNT_ID'),
+    'XPAY_BASE_URL'=>env('XPAY_BASE_URL','https://staging.xpay.app/api/v1'),
+    'XPAY_CURRENCY'=>env('XPAY_CURRENCY','EGP'),
+
+
+    #PAYERMAX
+    /*
+    * Base URLs:
+    * Test: https://pay-gate-uat.payermax.com/aggregate-pay/api/gateway
+    * Live: https://pay-gate.payermax.com/aggregate-pay/api/gateway
+    * Authentication: Uses RSA signature (SHA256WithRSA)
+    * Private Key: PKCS8 format (without headers/footers, or with -----BEGIN/END PRIVATE KEY-----)
+    * Public Key: PayerMax public key for signature verification (without headers/footers, or with -----BEGIN/END PUBLIC KEY-----)
+    */
+    'PAYERMAX_APP_ID'=>env('PAYERMAX_APP_ID'),
+    'PAYERMAX_MERCHANT_NO'=>env('PAYERMAX_MERCHANT_NO'),
+    'PAYERMAX_PRIVATE_KEY'=>env('PAYERMAX_PRIVATE_KEY'),
+    'PAYERMAX_PUBLIC_KEY'=>env('PAYERMAX_PUBLIC_KEY'),
+    'PAYERMAX_BASE_URL'=>env('PAYERMAX_BASE_URL','https://pay-gate-uat.payermax.com/aggregate-pay/api/gateway'),
+    'PAYERMAX_VERSION'=>env('PAYERMAX_VERSION','1.4'),
+    'PAYERMAX_KEY_VERSION'=>env('PAYERMAX_KEY_VERSION','1'),
+    'PAYERMAX_CURRENCY'=>env('PAYERMAX_CURRENCY','USD'),
+    'PAYERMAX_COUNTRY'=>env('PAYERMAX_COUNTRY','US'),
+
+
+    #VOLET
+    /*
+    * Shopping Cart Interface (SCI) Documentation: https://volet.com/files/documents/volet-sci-v1.0-en.pdf
+    * SCI URL: https://account.volet.com/sci/
+    * Authentication: Uses SCI password for hash verification (ac_hash)
+    * Hash format: SHA256(ac_transfer:ac_start_date:ac_sci_name:ac_src_wallet:ac_dest_wallet:ac_order_id:ac_amount:ac_merchant_currency:SCI's password)
+    * Status URL IPs: 50.7.115.5, 51.255.40.139, 13.53.55.89
+    */
+    'VOLET_ACCOUNT_EMAIL'=>env('VOLET_ACCOUNT_EMAIL'),
+    'VOLET_SCI_NAME'=>env('VOLET_SCI_NAME'),
+    'VOLET_SCI_PASSWORD'=>env('VOLET_SCI_PASSWORD'),
+    'VOLET_SCI_URL'=>env('VOLET_SCI_URL','https://account.volet.com/sci/'),
+    'VOLET_CURRENCY'=>env('VOLET_CURRENCY','USD'),
+
+        
     
+
 ];

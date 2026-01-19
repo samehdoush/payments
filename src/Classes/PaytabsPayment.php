@@ -16,11 +16,11 @@ use Nafezly\Payments\Classes\BaseController;
 class PaytabsPayment extends BaseController implements PaymentInterface
 {
 
-    private $paytabs_profile_id;
-    private $paytabs_base_url;
-    private $paytabs_server_key;
-    private $paytabs_checkout_lang;
-    private $verify_route_name;
+    public $paytabs_profile_id;
+    public $paytabs_base_url;
+    public $paytabs_server_key;
+    public $paytabs_checkout_lang;
+    public $verify_route_name;
 
 
     public function __construct()
@@ -31,6 +31,16 @@ class PaytabsPayment extends BaseController implements PaymentInterface
         $this->paytabs_checkout_lang = config('nafezly-payments.PAYTABS_CHECKOUT_LANG');
         $this->currency = config('nafezly-payments.PAYTABS_CURRENCY');
         $this->verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
+    }
+
+    /**
+     * Get language in Paytabs format (AR, EN)
+     *
+     * @return string
+     */
+    protected function getPaytabsLang()
+    {
+        return strtoupper($this->language);
     }
 
     /**
@@ -63,6 +73,9 @@ class PaytabsPayment extends BaseController implements PaymentInterface
         else
             $unique_id = $this->payment_id;
 
+        // Use setLanguage() if called, otherwise fall back to config
+        // Convert to Paytabs format (AR, EN)
+        $paypage_lang = $this->language ? $this->getPaytabsLang() : $this->paytabs_checkout_lang;
 
         $response = Http::withHeaders([
             'Authorization' => $this->paytabs_server_key,
@@ -76,7 +89,7 @@ class PaytabsPayment extends BaseController implements PaymentInterface
             "cart_amount" => $this->amount,
             "hide_shipping" => true,
             "cart_description" => "items",
-            "paypage_lang" => $this->paytabs_checkout_lang,
+            "paypage_lang" => $paypage_lang,
             "callback" => route($this->verify_route_name, ['payment_id' => $unique_id, 'payment' => "paytabs"]), //Post end point  -the payment status will be sent to server
             "return" => route($this->verify_route_name, ['payment_id' => $unique_id, 'payment' => "paytabs"]), //Get end point - The link to which the user will be redirected
             "customer_ref" => $unique_id,

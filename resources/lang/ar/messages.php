@@ -25,4 +25,6 @@ return [
     'SKIPCASH_PAYMENT_REFUNDED'=>'تم استرداد المبلغ',
     'SKIPCASH_PAYMENT_PENDING_REFUND'=>'استرداد معلق',
     'SKIPCASH_PAYMENT_REFUND_FAILED'=>'فشل في الاسترداد',
+    'REDIRECTING_TO_PAYMENT'=>"جاري التوجيه إلى صفحة الدفع...",
+    'PLEASE_WAIT_REDIRECT'=>"يرجى الانتظار بينما نوجهك إلى صفحة الدفع."
 ];

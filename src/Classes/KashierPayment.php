@@ -12,12 +12,15 @@ class KashierPayment extends BaseController implements PaymentInterface
     public  $kashier_url;
     public  $kashier_webhook_url;
     public  $kashier_mode;
-    private $kashier_account_key;
-    private $kashier_iframe_key;
-    private $kashier_token;
+    public  $kashier_account_key;
+    public $kashier_iframe_key;
+    public $kashier_token;
     public  $app_name;
+    public  $auto_redirect_back_on_fail = false;
+    public  $hosted_payment = false;
 
-    private $verify_route_name;
+
+    public $verify_route_name;
 
     public function __construct()
     {
@@ -30,6 +33,16 @@ class KashierPayment extends BaseController implements PaymentInterface
         $this->currency = config('nafezly-payments.KASHIER_CURRENCY');
         $this->app_name = config('nafezly-payments.APP_NAME');
         $this->verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
+    }
+
+    /**
+     * Get language in Kashier format (ar, en)
+     *
+     * @return string
+     */
+    protected function getKashierLang()
+    {
+        return $this->language;
     }
 
     
@@ -68,15 +81,45 @@ class KashierPayment extends BaseController implements PaymentInterface
             'order_id' => $order_id,
             'path' => $path,
             'hash' => $hash,
-            'source'=>$this->source,
+            'source'=>$this->source??"card,bank_installments,wallet,fawry",
+            'auto_redirect_back_on_fail'=>$this->auto_redirect_back_on_fail,
+            'language'=>$this->getKashierLang(),
+            'hosted_payment'=>$this->hosted_payment,
             'redirect_back' => route($this->verify_route_name, ['payment' => "kashier"])
         ];
 
-        return [
-            'payment_id' => $unique_id,
-            'html' => $this->generate_html($data),
-            'redirect_url'=>""
-        ];
+
+        if($this->hosted_payment == false){
+            return [
+                'payment_id' => $unique_id,
+                'html' => $this->generate_html($data),
+                'redirect_url'=>""
+            ];
+        }
+        else{
+            $query = http_build_query([
+                'merchantId'        => $this->kashier_account_key,
+                'orderId'           => $data['order_id'],
+                'amount'            => $data['amount'],
+                'currency'          => $data['currency'],
+                'hash'              => $hash,
+                'mode'              => $this->kashier_mode == "live"?'live':'test',
+                'language'          => $this->language,
+                'display'           => $this->language,
+                'merchantRedirect'  => route($this->verify_route_name, ['payment' => "kashier"]),
+                'serverWebhook'     => route($this->verify_route_name, ['payment' => "kashier"]),
+                'paymentRequestId'  => $data['order_id'],
+                'allowedMethods'    => $this->source??"card,bank_installments,wallet,fawry",
+                'failureRedirect'   => route($this->verify_route_name, ['payment' => "kashier"]),
+            ]);
+
+            $url = $this->kashier_url."/?$query";
+            return [
+                'payment_id' => $unique_id,
+                'html'=>"",
+                'redirect_url'=>$url
+            ];
+        }
 
     }
 
@@ -139,6 +182,16 @@ class KashierPayment extends BaseController implements PaymentInterface
     private function generate_html($data): string
     {
         return view('nafezly::html.kashier', ['model' => $this, 'data' => $data])->render();
+    }
+
+    public function setAutoRedirectOnFail($value=false){
+        $this->auto_redirect_back_on_fail = $value;
+        return $this;
+    }
+    
+    public function setHostedPayment($value=false){
+        $this->hosted_payment = $value;
+        return $this;
     }
 
 }
