@@ -92,6 +92,7 @@ class NafezlyPaymentsServiceProvider extends ServiceProvider
         });
         $this->app->bind(GarantiBbvaPayment::class, function () {
             return new GarantiBbvaPayment();
+        });
         $this->app->bind(VoletPayment::class, function () {
             return new VoletPayment();
         });
