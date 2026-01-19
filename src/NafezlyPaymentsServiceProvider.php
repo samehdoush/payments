@@ -14,6 +14,7 @@ use Nafezly\Payments\Classes\TapPayment;
 use Nafezly\Payments\Classes\OpayPayment;
 use Nafezly\Payments\Classes\PaymobWalletPayment;
 use Nafezly\Payments\Classes\MoyasarPayment;
+use Nafezly\Payments\Classes\GarantiBbvaPayment;
 
 class NafezlyPaymentsServiceProvider extends ServiceProvider
 {
@@ -87,6 +88,9 @@ class NafezlyPaymentsServiceProvider extends ServiceProvider
         });
         $this->app->bind(MoyasarPayment::class, function () {
             return new MoyasarPayment();
+        });
+        $this->app->bind(GarantiBbvaPayment::class, function () {
+            return new GarantiBbvaPayment();
         });
     }
 

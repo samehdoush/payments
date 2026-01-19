@@ -283,6 +283,51 @@ $payment->setUserId($id)
 - Email is auto-generated as `{phone}@{domain}.com` if not provided
 - Each payment must use unique phone number and email to avoid fraud detection
 
+### Garanti BBVA (Sanal POS) Usage Example
+
+```php
+use Nafezly\Payments\Classes\GarantiBbvaPayment;
+
+$payment = new GarantiBbvaPayment();
+
+// Using pay function
+$payment->pay(
+    $amount,                    // Required: Payment amount
+    $user_id = null,            // Optional: User ID
+    $user_first_name,           // Required: User first name
+    $user_last_name,            // Required: User last name
+    $user_email,                // Required: User email
+    $user_phone = null          // Optional: User phone
+);
+
+// Using setter methods
+$payment->setUserId($id)
+        ->setUserFirstName($first_name)
+        ->setUserLastName($last_name)
+        ->setUserEmail($email)
+        ->setUserPhone($phone)
+        ->setAmount($amount)
+        ->pay();
+```
+
+**Garanti BBVA Configuration Requirements:**
+- `GARANTIBBVA_MERCHANT_ID`
+- `GARANTIBBVA_TERMINAL_ID`
+- `GARANTIBBVA_PROV_USER_ID`
+- `GARANTIBBVA_TERMINAL_USER_ID`
+- `GARANTIBBVA_PROVISION_PASSWORD`
+- `GARANTIBBVA_STORE_KEY`
+- `GARANTIBBVA_MODE` (test/live)
+- `GARANTIBBVA_SECURITY_LEVEL` (CUSTOM_PAY, 3D_PAY, 3D_FULL, 3D_HALF)
+- `GARANTIBBVA_CURRENCY_CODE` (949=TRY, 840=USD, 978=EUR, 826=GBP, 392=JPY)
+- `GARANTIBBVA_TXN_TYPE` (sales)
+- `GARANTIBBVA_INSTALLMENT_COUNT` (0 for no installment)
+
+**Important Notes for Garanti BBVA:**
+- The gateway returns the result by POST to the verify route.
+- Hash verification is already implemented; keep the `STORE_KEY` correct.
+- Amount is multiplied by `GARANTIBBVA_AMOUNT_MULTIPLIER` (default 100).
+
 ## Some Test Cards
 
 - [SkipCash](https://dev.skipcash.app/doc/api-integration/)
