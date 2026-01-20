@@ -124,7 +124,7 @@
 
     <div class="amount">
         <span>Tahsil Edilecek Tutar</span>
-        <strong>{{ $data['txnamount'] }}</strong>
+        <strong>{{ $data['display_amount'] }}</strong>
     </div>
 
     <form method="post" action="{{ $data['action_url'] }}">
