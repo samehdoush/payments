@@ -132,7 +132,7 @@
         <input type="hidden" name="apiversion" id="apiversion" value="{{ $data['api_version'] }}" />
         <input type="hidden" name="secure3dsecuritylevel" id="secure3dsecuritylevel" value="{{ $data['security_level'] }}" />
         <input type="hidden" name="terminalprovuserid" id="terminalprovuserid" value="{{ $data['terminalprovuserid'] }}" />
-        <input type="hidden" name="terminaluserid" id="terminaluserid" value="{{ $data['terminaluserid'] }}" />
+        <input type="hidden" name="terminaluserid" id="terminaluserid" value="{{ $data['terminaluserid']??'GARANTI' }}" />
         <input type="hidden" name="terminalmerchantid" id="terminalmerchantid" value="{{ $data['terminalmerchantid'] }}" />
         <input type="hidden" name="terminalid" id="terminalid" value="{{ $data['terminalid'] }}" />
         <input type="hidden" name="orderid" id="orderid" value="{{ $data['orderid'] }}" />

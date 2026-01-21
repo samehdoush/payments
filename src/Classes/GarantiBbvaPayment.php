@@ -147,9 +147,8 @@ class GarantiBbvaPayment extends BaseController implements PaymentInterface
     private function generateHashData($order_id, $amount, $currency_code, $success_url, $error_url, $type, $installment_count): string
     {
         $hashed_password = $this->generateSecurityData($this->terminal_id);
-        // Terminal ID must be padded to 9 digits in hash calculation
-        $padded_terminal_id = str_pad((int) $this->terminal_id, 9, '0', STR_PAD_LEFT);
-        $hash_string = $padded_terminal_id . $order_id . $amount . $currency_code . $success_url . $error_url . $type . $installment_count . $this->store_key . $hashed_password;
+        $terminal_id = (string) $this->terminal_id;
+        $hash_string = $terminal_id . $order_id . $amount . $currency_code . $success_url . $error_url . $type . $installment_count . $this->store_key . $hashed_password;
         return strtoupper(hash('sha512', $hash_string));
     }
 

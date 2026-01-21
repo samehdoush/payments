@@ -206,7 +206,7 @@ return [
     'GARANTIBBVA_AMOUNT_MULTIPLIER'=>env('GARANTIBBVA_AMOUNT_MULTIPLIER',100),
     'GARANTIBBVA_COMPANY_NAME'=>env('GARANTIBBVA_COMPANY_NAME',env('APP_NAME')),
     'GARANTIBBVA_TEST_URL'=>env('GARANTIBBVA_TEST_URL','https://sanalposprovtest.garantibbva.com.tr/servlet/gt3dengine'),
-    'GARANTIBBVA_LIVE_URL'=>env('GARANTIBBVA_LIVE_URL','https://sanalposprov.garantibbva.com.tr/servlet/gt3dengine'),
+    'GARANTIBBVA_LIVE_URL'=>env('GARANTIBBVA_LIVE_URL','https://sanalposprov.garanti.com.tr/servlet/gt3dengine'),
 
     'ONELAT_KEY'=>env('ONELAT_KEY',''),
     'ONELAT_SECRET'=>env('ONELAT_SECRET',''),
