@@ -110,6 +110,15 @@
             font-size: 12px;
             text-align: center;
         }
+        .hint {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        input:invalid {
+            border-color: #ef4444;
+        }
         @media (max-width: 520px) {
             .grid { grid-template-columns: 1fr; }
         }
@@ -157,28 +166,104 @@
 
         <div class="field">
             <label for="cardnumber">Kart Numarası</label>
-            <input type="text" id="cardnumber" name="cardnumber" inputmode="numeric" autocomplete="cc-number" required />
+            <input type="text" id="cardnumber" name="cardnumber" inputmode="numeric" autocomplete="cc-number" 
+                   pattern="[0-9]{13,19}" maxlength="19" placeholder="0000 0000 0000 0000" required />
+            <small class="hint">16 haneli kart numaranızı giriniz</small>
         </div>
 
         <div class="grid">
             <div class="field">
                 <label for="cardexpiredatemonth">Son Kullanma (Ay)</label>
-                <input type="text" id="cardexpiredatemonth" name="cardexpiredatemonth" inputmode="numeric" autocomplete="cc-exp-month" placeholder="MM" required />
+                <input type="text" id="cardexpiredatemonth" name="cardexpiredatemonth" inputmode="numeric" 
+                       autocomplete="cc-exp-month" pattern="(0[1-9]|1[0-2])" maxlength="2" placeholder="MM" required />
+                <small class="hint">01-12 arası</small>
             </div>
             <div class="field">
                 <label for="cardexpiredateyear">Son Kullanma (Yıl)</label>
-                <input type="text" id="cardexpiredateyear" name="cardexpiredateyear" inputmode="numeric" autocomplete="cc-exp-year" placeholder="YY" required />
+                <input type="text" id="cardexpiredateyear" name="cardexpiredateyear" inputmode="numeric" 
+                       autocomplete="cc-exp-year" pattern="[0-9]{2}" maxlength="2" placeholder="YY" required />
+                <small class="hint">Örn: 26, 27, 28</small>
             </div>
         </div>
 
         <div class="field">
             <label for="cardcvv2">CVV</label>
-            <input type="password" id="cardcvv2" name="cardcvv2" inputmode="numeric" autocomplete="cc-csc" required />
+            <input type="password" id="cardcvv2" name="cardcvv2" inputmode="numeric" autocomplete="cc-csc" 
+                   pattern="[0-9]{3,4}" maxlength="4" placeholder="***" required />
+            <small class="hint">Kartın arkasındaki 3-4 haneli kod</small>
         </div>
 
         <button type="submit" class="submit">Ödemeye Devam Et</button>
         <div class="note">3D Secure doğrulamasına yönlendirileceksiniz.</div>
     </form>
 </div>
+<script>
+    // Auto-format card number with spaces
+    document.getElementById('cardnumber').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        e.target.value = value;
+    });
+
+    // Validate and pad month with leading zero
+    document.getElementById('cardexpiredatemonth').addEventListener('blur', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length === 1 && parseInt(value) >= 1 && parseInt(value) <= 9) {
+            e.target.value = '0' + value;
+        } else if (value.length === 2) {
+            let month = parseInt(value);
+            if (month < 1) e.target.value = '01';
+            else if (month > 12) e.target.value = '12';
+            else e.target.value = value;
+        }
+    });
+
+    // Validate year (only allow 2 digits)
+    document.getElementById('cardexpiredateyear').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 2);
+    });
+
+    // Validate CVV (only allow 3-4 digits)
+    document.getElementById('cardcvv2').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+    });
+
+    // Form validation before submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const month = document.getElementById('cardexpiredatemonth').value;
+        const year = document.getElementById('cardexpiredateyear').value;
+        const cardNumber = document.getElementById('cardnumber').value;
+        const cvv = document.getElementById('cardcvv2').value;
+
+        // Validate card number length
+        if (cardNumber.length < 13 || cardNumber.length > 19) {
+            e.preventDefault();
+            alert('Lütfen geçerli bir kart numarası giriniz (13-19 hane)');
+            return false;
+        }
+
+        // Validate month
+        if (!/^(0[1-9]|1[0-2])$/.test(month)) {
+            e.preventDefault();
+            alert('Lütfen geçerli bir ay giriniz (01-12)');
+            return false;
+        }
+
+        // Validate year
+        if (!/^[0-9]{2}$/.test(year)) {
+            e.preventDefault();
+            alert('Lütfen geçerli bir yıl giriniz (örn: 26)');
+            return false;
+        }
+
+        // Validate CVV
+        if (cvv.length < 3 || cvv.length > 4) {
+            e.preventDefault();
+            alert('Lütfen geçerli bir CVV giriniz (3-4 hane)');
+            return false;
+        }
+
+        return true;
+    });
+</script>
 </body>
 </html>

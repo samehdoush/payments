@@ -171,7 +171,8 @@ class GarantiBbvaPayment extends BaseController implements PaymentInterface
         }
         $digest_data .= $this->store_key;
 
-        $calculated_hash = strtoupper(sha1($digest_data));
+        // Use SHA-512 to match the hash format returned by Garanti BBVA
+        $calculated_hash = strtoupper(hash('sha512', $digest_data));
         return hash_equals($calculated_hash, strtoupper($response_hash));
     }
 
