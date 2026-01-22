@@ -33,7 +33,7 @@ class GarantiBbvaPayment extends BaseController implements PaymentInterface
         $this->merchant_id = config('nafezly-payments.GARANTIBBVA_MERCHANT_ID');
         $this->terminal_id = config('nafezly-payments.GARANTIBBVA_TERMINAL_ID');
         $this->prov_user_id = config('nafezly-payments.GARANTIBBVA_PROV_USER_ID');
-        $this->terminal_user_id = config('nafezly-payments.GARANTIBBVA_TERMINAL_USER_ID');
+        $this->terminal_user_id = config('nafezly-payments.GARANTIBBVA_TERMINAL_USER_ID','GARANTI');
         $this->provision_password = config('nafezly-payments.GARANTIBBVA_PROVISION_PASSWORD');
         $this->store_key = config('nafezly-payments.GARANTIBBVA_STORE_KEY');
         $this->mode = config('nafezly-payments.GARANTIBBVA_MODE', 'test');
@@ -139,8 +139,8 @@ class GarantiBbvaPayment extends BaseController implements PaymentInterface
 
     private function generateSecurityData($terminal_id): string
     {
-        $terminal_id = str_pad((int) $terminal_id, 9, '0', STR_PAD_LEFT);
-        $sha_data = sha1($this->provision_password . $terminal_id);
+        // Formula: hashedPassword = SHA1(provisionPassword + "0" + terminalId)
+        $sha_data = sha1($this->provision_password . '0' . $terminal_id);
         return strtoupper($sha_data);
     }
 
