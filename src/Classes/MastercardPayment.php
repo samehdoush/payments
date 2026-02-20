@@ -105,6 +105,7 @@ class MastercardPayment extends BaseController implements PaymentInterface
         $session_id = $response['body']['session']['id'];
 
         return [
+            'success' => true,
             'payment_id' => $payment_id,
             'html' => $this->generate_html([
                 'session_id' => $session_id,

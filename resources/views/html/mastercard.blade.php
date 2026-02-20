@@ -3,9 +3,6 @@
     Checkout.configure({
         session: {
             id: '{{$data['session_id']}}'
-        },
-        interaction: {
-            returnUrl: '{{$data['return_url']}}'
         }
     });
     Checkout.showPaymentPage();
