@@ -51,6 +51,7 @@ PayPal, Stripe, Paymob, Fawry, HyperPay, Thawani, Tap, Opay, PayTabs, Binance, C
 - [OneLat](https://one.lat/)
 - [Changelly](https://changelly.com/)
 - [YallaPay](https://yallapay.io/)
+- [Mastercard Gateway](https://test-gateway.mastercard.com/)
 
 
 ## Installation
@@ -246,6 +247,51 @@ $payment->verify($request);
 ]
 
 ```
+
+### Mastercard Usage Example
+
+```php
+use Nafezly\Payments\Classes\MastercardPayment;
+
+$payment = new MastercardPayment();
+
+$response = $payment->setUserId($id)
+    ->setUserFirstName($first_name)
+    ->setUserLastName($last_name)
+    ->setUserEmail($email)
+    ->setUserPhone($phone)
+    ->setAmount($amount)
+    ->setCurrency('USD')
+    ->setOperation('PAY') // PAY or AUTHORIZE
+    ->pay();
+
+// $response contains:
+// payment_id, html (Hosted Checkout script), redirect_url
+
+// verify callback in your verify-payment route:
+// $verify = (new MastercardPayment())->verify($request);
+```
+
+### Mastercard Token / Recurring Charge Example
+
+```php
+use Nafezly\Payments\Classes\MastercardPayment;
+
+$gateway = new MastercardPayment();
+
+// 1) Run first payer-initiated payment via Hosted Checkout
+// 2) In verify response, check if token exists in process_data['tokenization']['token']
+// 3) Store token in your project DB
+
+$charge = $gateway->chargeByToken(
+    100.00,
+    $storedToken,
+    'order_12345',
+    'USD',
+    'PAY' // or AUTHORIZE
+);
+```
+
 ### Factory Pattern Use
 you can pass only method name without payment key word like (Fawry,Paymob,Opay,SkipCash ...etc) 
 and the factory will return the payment instance for you , use it as you want ;)

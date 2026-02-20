@@ -16,6 +16,7 @@ use Nafezly\Payments\Classes\PaymobWalletPayment;
 use Nafezly\Payments\Classes\MoyasarPayment;
 use Nafezly\Payments\Classes\GarantiBbvaPayment;
 use Nafezly\Payments\Classes\VoletPayment;
+use Nafezly\Payments\Classes\MastercardPayment;
 
 class NafezlyPaymentsServiceProvider extends ServiceProvider
 {
@@ -95,6 +96,9 @@ class NafezlyPaymentsServiceProvider extends ServiceProvider
         });
         $this->app->bind(VoletPayment::class, function () {
             return new VoletPayment();
+        });
+        $this->app->bind(MastercardPayment::class, function () {
+            return new MastercardPayment();
         });
     }
 
