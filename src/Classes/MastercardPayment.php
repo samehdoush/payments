@@ -182,7 +182,6 @@ class MastercardPayment extends BaseController implements PaymentInterface
         $payload = [
             'apiOperation' => $operation,
             'order' => [
-                'id' => (string) $payment_id,
                 'amount' => $this->formatAmount($amount),
                 'currency' => strtoupper($currency ?: $this->mastercard_currency),
                 'description' => $this->app_name . ' #' . $payment_id,
