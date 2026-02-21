@@ -262,9 +262,11 @@ class MastercardPayment extends BaseController implements PaymentInterface
     private function extractTokenFromResponse(array $response): ?string
     {
         $paths = [
+            ['tokenization', 'token'],
             ['sourceOfFunds', 'token'],
             ['sourceOfFunds', 'provided', 'card', 'token'],
             ['transaction', 'sourceOfFunds', 'token'],
+            ['transaction', 'sourceOfFunds', 'provided', 'card', 'token'],
             ['order', 'sourceOfFunds', 'token'],
         ];
 
@@ -272,6 +274,23 @@ class MastercardPayment extends BaseController implements PaymentInterface
             $value = data_get($response, implode('.', $path));
             if (!empty($value) && is_string($value)) {
                 return $value;
+            }
+        }
+
+        $transactions = data_get($response, 'transaction');
+        if (is_array($transactions)) {
+            foreach ($transactions as $transaction) {
+                if (! is_array($transaction)) {
+                    continue;
+                }
+
+                $transactionToken = data_get($transaction, 'sourceOfFunds.token')
+                    ?? data_get($transaction, 'sourceOfFunds.provided.card.token')
+                    ?? data_get($transaction, 'tokenization.token');
+
+                if (! empty($transactionToken) && is_string($transactionToken)) {
+                    return $transactionToken;
+                }
             }
         }
 
