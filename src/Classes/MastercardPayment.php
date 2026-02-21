@@ -226,6 +226,45 @@ class MastercardPayment extends BaseController implements PaymentInterface
         ];
     }
 
+    public function createTokenFromOrder(string $referenceOrderId, ?string $currency = null): array
+    {
+        if (empty($referenceOrderId)) {
+            return [
+                'success' => false,
+                'token' => null,
+                'process_data' => ['error' => 'reference_order_id_is_required'],
+            ];
+        }
+
+        $payload = [
+            'referenceOrderId' => (string) $referenceOrderId,
+            'transaction' => [
+                'currency' => strtoupper((string) ($currency ?: $this->mastercard_currency)),
+            ],
+        ];
+
+        $response = $this->gatewayRequest('post', '/merchant/' . $this->mastercard_merchant_id . '/token', $payload);
+
+        if (! $response['ok']) {
+            return [
+                'success' => false,
+                'token' => null,
+                'process_data' => $response['body'],
+            ];
+        }
+
+        $body = $response['body'];
+        $result = strtoupper((string) data_get($body, 'result', ''));
+        $status = strtoupper((string) data_get($body, 'status', ''));
+        $token = data_get($body, 'token');
+
+        return [
+            'success' => $result === 'SUCCESS' && ! empty($token) && ($status === '' || $status === 'VALID'),
+            'token' => is_string($token) ? $token : null,
+            'process_data' => $body,
+        ];
+    }
+
     public function generate_html($data)
     {
         return str_replace("\n", '', view('nafezly::html.mastercard', ['data' => $data])->render());
