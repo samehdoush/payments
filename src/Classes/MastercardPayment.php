@@ -141,10 +141,11 @@ class MastercardPayment extends BaseController implements PaymentInterface
         }
 
         $body = $response['body'];
-        $result = strtoupper($body['result'] ?? '');
-        $gateway_code = strtoupper($body['response']['gatewayCode'] ?? '');
+        ['is_success' => $is_success, 'gateway_code' => $gateway_code] = $this->resolveSuccessState($body);
 
-        $is_success = $result === 'SUCCESS' && in_array($gateway_code, ['APPROVED', 'APPROVED_AUTO', 'APPROVED_PENDING_SETTLEMENT']);
+        if (! empty($gateway_code) && empty(data_get($body, 'response.gatewayCode'))) {
+            data_set($body, 'response.gatewayCode', $gateway_code);
+        }
 
         $token = $this->extractTokenFromResponse($body);
         if ($token) {
@@ -211,9 +212,11 @@ class MastercardPayment extends BaseController implements PaymentInterface
         }
 
         $body = $response['body'];
-        $result = strtoupper($body['result'] ?? '');
-        $gateway_code = strtoupper($body['response']['gatewayCode'] ?? '');
-        $is_success = $result === 'SUCCESS' && in_array($gateway_code, ['APPROVED', 'APPROVED_AUTO', 'APPROVED_PENDING_SETTLEMENT']);
+        ['is_success' => $is_success, 'gateway_code' => $gateway_code] = $this->resolveSuccessState($body);
+
+        if (! empty($gateway_code) && empty(data_get($body, 'response.gatewayCode'))) {
+            data_set($body, 'response.gatewayCode', $gateway_code);
+        }
 
         return [
             'success' => $is_success,
@@ -287,5 +290,55 @@ class MastercardPayment extends BaseController implements PaymentInterface
         $host = $parts['host'] ?? 'test-gateway.mastercard.com';
 
         return $scheme . '://' . $host . '/static/checkout/checkout.min.js';
+    }
+
+    private function resolveSuccessState(array $body): array
+    {
+        $approvedCodes = ['APPROVED', 'APPROVED_AUTO', 'APPROVED_PENDING_SETTLEMENT'];
+
+        $result = strtoupper((string) data_get($body, 'result', ''));
+        $gatewayCodes = $this->extractGatewayCodes($body);
+        $primaryGatewayCode = $gatewayCodes[0] ?? '';
+
+        if (! empty($gatewayCodes)) {
+            foreach ($gatewayCodes as $code) {
+                if (in_array($code, $approvedCodes, true)) {
+                    return ['is_success' => $result === 'SUCCESS', 'gateway_code' => $code];
+                }
+            }
+
+            return ['is_success' => false, 'gateway_code' => $primaryGatewayCode];
+        }
+
+        $orderStatus = strtoupper((string) data_get($body, 'order.status', ''));
+        $isSuccessByOrderStatus = in_array($orderStatus, ['CAPTURED', 'AUTHORIZED', 'PARTIALLY_CAPTURED', 'PARTIALLY_AUTHORIZED'], true);
+
+        return [
+            'is_success' => $result === 'SUCCESS' && $isSuccessByOrderStatus,
+            'gateway_code' => $primaryGatewayCode,
+        ];
+    }
+
+    private function extractGatewayCodes(array $body): array
+    {
+        $codes = [];
+
+        $directCode = strtoupper((string) data_get($body, 'response.gatewayCode', ''));
+        if (! empty($directCode)) {
+            $codes[] = $directCode;
+        }
+
+        $transactions = data_get($body, 'transaction');
+
+        if (is_array($transactions)) {
+            foreach ($transactions as $transaction) {
+                $code = strtoupper((string) data_get($transaction, 'response.gatewayCode', ''));
+                if (! empty($code)) {
+                    $codes[] = $code;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($codes)));
     }
 }
