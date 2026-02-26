@@ -299,7 +299,21 @@ return [
     'VOLET_SCI_URL'=>env('VOLET_SCI_URL','https://account.volet.com/sci/'),
     'VOLET_CURRENCY'=>env('VOLET_CURRENCY','USD'),
 
-        
-    
+
+    #TABBY
+    /*
+    * Tabby - Buy Now Pay Later
+    * Documentation: https://docs.tabby.ai/
+    * API Base URL: https://api.tabby.ai/api/v2
+    * Authentication: Bearer token using secret key
+    * Flow: Create checkout session -> Redirect to web_url -> Verify -> Capture
+    * Test credentials: email otp.success@tabby.ai, phone +966500000001, OTP 8888
+    */
+    'TABBY_SECRET_KEY'=>env('TABBY_SECRET_KEY'),
+    'TABBY_PUBLIC_KEY'=>env('TABBY_PUBLIC_KEY'),
+    'TABBY_MERCHANT_CODE'=>env('TABBY_MERCHANT_CODE'),
+    'TABBY_MODE'=>env('TABBY_MODE','test'),
+    'TABBY_CURRENCY'=>env('TABBY_CURRENCY','SAR'),
+
 
 ];
